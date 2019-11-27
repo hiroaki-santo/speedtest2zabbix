@@ -9,7 +9,7 @@ printf "\033c"
 # 10-Feb-2019
 ###################################################################################
 #
-# Tested with Zabbix vZabbix 3.0.24 & Speedtest-cli v2.0.0
+# Tested with Zabbix vZabbix 3.4.15 & Speedtest-cli v2.7.12
 echo "checking speedtest and report back to zabbix, please wait..."
 
 #################
@@ -25,7 +25,7 @@ ZABBIX_DATA=/tmp/zbxdata_$TIMESTAMP.log
 # Speedtest
 SPEEDTEST="/usr/bin/speedtest-cli"
 CACHE_FILE=/tmp/speedtest_$TIMESTAMP.log
-ID="21197" # Test against server ID, to get all servers ID - run 'speedtest --list' 
+ID="15047" # Test against server ID, to get all servers ID - run 'speedtest --list' 
 
                 ###################################################################################
                 ###   Israel Servers List                                                       ###
@@ -48,6 +48,7 @@ ID="21197" # Test against server ID, to get all servers ID - run 'speedtest --li
                 ###    8333) 3SAMNET (Jerusalem, Israel) [116.76 km]                            ###
                 ###    1075) Coolnet (Jerusalem, Israel) [116.76 km]                            ###
                 ###    4138) Pelephone Communications (Ashkelon, Israel) [133.79 km]            ###
+                ###   15047) OPEN Project (via 20G SINET) - Tokyo                               ###
                 ###################################################################################
 
 
@@ -55,7 +56,7 @@ ID="21197" # Test against server ID, to get all servers ID - run 'speedtest --li
 #################
 # Generate data #
 #################
-speedtest --server $ID --csv > $CACHE_FILE
+$SPEEDTEST --server $ID --csv > $CACHE_FILE
 
 ##################
 # Extract fields #
@@ -81,22 +82,28 @@ UP=$(echo "$UP_TMP" |  awk '{ printf("%.2f\n", $1 / 1024 /1024 ) }')
 #####################
 # Write Zabbix Data #
 #####################
- echo "SpeedTest" key.download $DL >> $ZABBIX_DATA 
- echo "SpeedTest" key.upload $UP >> $ZABBIX_DATA 
- echo "SpeedTest" key.wan.ip $WAN_IP >> $ZABBIX_DATA 
- echo "SpeedTest" key.ping $PING >> $ZABBIX_DATA
- echo "SpeedTest" key.srv.name $SRV_NAME >> $ZABBIX_DATA
- echo "SpeedTest" key.srv.city $SRV_CITY >> $ZABBIX_DATA
- echo "SpeedTest" key.srv.km $SRV_KM >> $ZABBIX_DATA
+ echo $ZABBIX_HOST key.download $DL >> $ZABBIX_DATA 
+ echo $ZABBIX_HOST key.upload $UP >> $ZABBIX_DATA 
+ echo $ZABBIX_HOST key.wan.ip $WAN_IP >> $ZABBIX_DATA 
+ echo $ZABBIX_HOST key.ping $PING >> $ZABBIX_DATA
+ echo $ZABBIX_HOST key.srv.name $SRV_NAME >> $ZABBIX_DATA
+ echo $ZABBIX_HOST key.srv.city $SRV_CITY >> $ZABBIX_DATA
+ echo $ZABBIX_HOST key.srv.km $SRV_KM >> $ZABBIX_DATA
 
 ##########################
 # zabbix sender finction #
 ##########################
 function send_value {
-        /usr/bin/zabbix_sender -z ZABBIX_SERVER_IP_OR_FQDN -i $ZABBIX_DATA
+        /usr/bin/zabbix_sender -z $ZABBIX_SRV -i $ZABBIX_DATA
 }
 
 #######################
 # Send data to Zabbix #
 send_value
+#######################
+
+#######################
+# remove temporary files
+rm $ZABBIX_DATA
+rm $CACHE_FILE
 #######################
