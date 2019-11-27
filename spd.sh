@@ -9,7 +9,7 @@ printf "\033c"
 # 10-Feb-2019
 ###################################################################################
 #
-# Tested with Zabbix vZabbix 3.4.15 & Speedtest-cli v2.7.12
+# Tested with Zabbix vZabbix 3.4.15 & Speedtest-cli v2.1.2
 echo "checking speedtest and report back to zabbix, please wait..."
 
 #################
