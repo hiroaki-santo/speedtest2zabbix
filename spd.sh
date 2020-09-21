@@ -18,6 +18,7 @@ echo "checking speedtest and report back to zabbix, please wait..."
 # Zabbix 
 TIMESTAMP=$(date "+%Y.%m.%d-%H.%M.%S")
 ZABBIX_SENDER="/usr/bin/zabbix_sender"
+ZABBIX_CONFIG="/etc/zabbix/zabbix_agentd.conf"
 ZABBIX_HOST="SpeedTest"
 ZABBIX_SRV="zabbix IP or FQDN"
 ZABBIX_LOG="/dev/null"
@@ -94,7 +95,7 @@ UP=$(echo "$UP_TMP" |  awk '{ printf("%.2f\n", $1 / 1024 /1024 ) }')
 # zabbix sender finction #
 ##########################
 function send_value {
-        /usr/bin/zabbix_sender -z $ZABBIX_SRV -i $ZABBIX_DATA
+        $ZABBIX_SENDER -c $ZABBIX_CONFIG -z $ZABBIX_SRV -i $ZABBIX_DATA
 }
 
 #######################
